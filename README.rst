@@ -9,6 +9,18 @@ robot that resides in a letterbox.
 The hardware consists of a PIR sensor and an HT0740 Switch controlling a 12v
 power supply to toggle a 2.5 meter strip of white LEDs, to light the garden path.
 
+It also has a Pi camera that looks down from the ceiling to view what's in the
+mailbox and provides a live video stream, with both daylight and night settings.
+
+This currently runs as a simple daemon process but at some point will use the 
+KROS Core robot operating system, a Python3-based Subsumption Architecture, 
+basically a publish-subscribe pattern implemented using an asyncio message bus,
+where the robot sensors are publishers, motor controllers and other output 
+devices, etc. act as subscribers. Subscribers indicate what event types they're 
+interested in. Events are pushed onto the message bus, passed through an 
+Arbitrator and on to a Controller. The Controller for the LBR01 will control
+both the camera and the LED light strip.
+
 
 .. image:: https://service.robots.org.nz/wiki/attach/LBR01/LetterboxRobot2778.jpg
    :width: 1200px
