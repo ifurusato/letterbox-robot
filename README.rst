@@ -9,24 +9,24 @@ robot that resides in a letterbox.
 The hardware consists of a PIR sensor and an HT0740 Switch controlling a 12v
 power supply to toggle a 2.5 meter strip of white LEDs, to light the garden path.
 
-.. image:: https://service.robots.org.nz/wiki/attach/KR01/KR01-0533-1280x584.jpg
-   :width: 1280px
+
+.. image:: https://service.robots.org.nz/wiki/attach/LBR01/LetterboxRobot2778.jpg
+   :width: 1200px
    :align: center
-   :height: 584px
-   :alt: The KR01 Robot
+   :height: 676px
+   :alt: The LBR01 Robot
 
 More information can be found on the New Zealand Personal Robotic Group (NZPRG) Blog at:
 
-* `The KR01 Robot Project <https://robots.org.nz/2019/12/08/kr01/>`
-* `Differential Drive <https://robots.org.nz/category/kd01/>` (the KD01 robot)
 * `Facilius Est Multa Facere Quam Diu <https://robots.org.nz/2020/04/24/facilius-est/>`
 
 and the NZPRG wiki at:
 
-* `KR01 Robot <https://service.robots.org.nz/wiki/Wiki.jsp?page=KR01>`
+* `LBR01 Robot <https://service.robots.org.nz/wiki/Wiki.jsp?page=LBR01>`
 
 This project is part of the *New Zealand Personal Robotics (NZPRG)* "Robot
 Operating System" — not to be confused with other "ROS" projects. 
+
 
 Features
 ********
