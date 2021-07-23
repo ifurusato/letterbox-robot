@@ -13,8 +13,9 @@
 #
 
 import sys
-from lib.pir_switch import PirSwitch
-from lib.logger import Level
+
+from core.logger import Level
+from lbr.pir_switch import PirSwitch
 
 try:
     _pin = 24

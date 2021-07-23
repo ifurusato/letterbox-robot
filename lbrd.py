@@ -20,7 +20,7 @@ try:
     from daemon import pidfile
 except Exception:
     sys.exit("This script requires the python-daemon module.\nInstall with: pip3 install --user python-daemon")
-
+from pathlib import Path
 import os, time, traceback
 from datetime import datetime
 
@@ -30,12 +30,11 @@ from core.logger import Logger, Level
 
 PIDFILE = '/home/pi/letterbox-robot/.lbrd.pid'
 
-# ..............................................................................
-
+# ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 def shutdown(signum, frame):  # signum and frame are mandatory
     sys.exit(0)
 
-# ..............................................................................
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 class LetterboxRobotDaemon():
     '''
     The daemon controlling the Letterbox Robot (PirSwitch) application.
@@ -46,7 +45,7 @@ class LetterboxRobotDaemon():
         if config is None:
             raise ValueError('no configuration provided.')
         self._log.info('configuration provided.')
-#       self._config = config['lbrd']
+        self._config = config
 #       _toggle_pin  = self._config.get('toggle_pin')
         # TODO
         _pin = 24
@@ -61,29 +60,53 @@ class LetterboxRobotDaemon():
         self._log.info('gid:  {}'.format(os.getgid()))
         self._log.info('cwd:  {}'.format(os.getcwd()))
         self._log.info('pid file: {}'.format(PIDFILE))
+        # configured features ..........................
+        self._set_pi_leds(False)
         self._log.info('lbrd ready.')
 
-    # ..........................................................................
+    # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
     def _get_timestamp(self):
         return datetime.utcfromtimestamp(datetime.utcnow().timestamp()).isoformat()
 
-    # ..........................................................................
+    # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+    def _set_pi_leds(self, enable):
+        '''
+        Enables or disables the Raspberry Pi's board LEDs.
+        '''
+        _sudo_name  = self._config['pi'].get('sudo_name')
+        _led_0_path = self._config['pi'].get('led_0_path')
+        _led_0 = Path(_led_0_path)
+        _led_1_path = self._config['pi'].get('led_1_path')
+        _led_1 = Path(_led_1_path)
+        if _led_0.is_file() and _led_0.is_file():
+            if enable:
+                self._log.info('re-enabling LEDs...')
+                os.system('echo 1 | {} tee {}'.format(_sudo_name,_led_0_path))
+                os.system('echo 1 | {} tee {}'.format(_sudo_name,_led_1_path))
+            else:
+                self._log.info('disabling LEDs...')
+                os.system('echo 0 | {} tee {}'.format(_sudo_name,_led_0_path))
+                os.system('echo 0 | {} tee {}'.format(_sudo_name,_led_1_path))
+        else:
+            self._log.warning('could not change state of LEDs: does not appear to be a Raspberry Pi.')
+
+    # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
     def enable(self):
         self._pir.enable()
         self._log.info('🍏 letterbox robot daemon enabled at: {}'.format(self._get_timestamp()))
 
-    # ..........................................................................
+    # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
     def disable(self):
         self._pir.disable()
 
-    # ..........................................................................
+    # ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
     def close(self):
         self._pir.disable()
         self._pir.close()
+        self._set_pi_leds(True)
         self._log.info('🍎 letterbox robot daemon closed at: {}'.format(self._get_timestamp()))
 
-# main .........................................................................
-
+# ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 def main():
 
     _daemon = None
@@ -114,8 +137,7 @@ def main():
                 print('error closing lbrd daemon.')
         print('lbrd complete.')
 
-# ..............................................................................
-
+# ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 with daemon.DaemonContext(
     stdout=sys.stdout,
     stderr=sys.stderr,

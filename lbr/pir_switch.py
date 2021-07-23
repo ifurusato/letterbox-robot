@@ -40,13 +40,14 @@ class PirSwitch(object):
     :param i2c_address:  the I²C address of the HT0740
     :param level:        the log level
     '''
-    def __init__(self, pin, i2c_address, level=Level.INFO):
-        self._log = Logger("pir-switch", level)
+    def __init__(self, pin, i2c_address, switch_tied_to_light=True, level=Level.INFO):
+        self._log = Logger("pir", level)
         self._pin         = pin
         self._enabled     = False
         self._count       = 0
         self._count_limit = 10
         self._thread      = None
+        self._switch_tied_to_light = switch_tied_to_light
         self._log.info('configuring pir on pin {}'.format(pin))
         # The GPIO pin is set up as an input, pulled low to avoid false
         # detection. The pin is wired to connect to GND on button press.
@@ -66,11 +67,15 @@ class PirSwitch(object):
     # ..........................................................................
     def enable(self):
         self._log.info("enabling pir switch...")
+        if not self._switch_tied_to_light:
+            self.light(True)
         self._set_active(True)
 
     # ..........................................................................
     def disable(self):
         self._log.info("disabling pir switch...")
+        if not self._switch_tied_to_light:
+            self.light(False)
         self._set_active(False)
 
     # ..........................................................................
@@ -132,7 +137,8 @@ class PirSwitch(object):
         '''
         self._log.info('switch ON.')
         self.switch(True)
-        self.light(True)
+        if self._switch_tied_to_light:
+            self.light(True)
 
     # ..........................................................................
     def turn_off_switch(self):
@@ -141,7 +147,8 @@ class PirSwitch(object):
         '''
         self._log.info('switch OFF.')
         self.switch(False)
-        self.light(False)
+        if self._switch_tied_to_light:
+            self.light(False)
 
     # ..........................................................................
     def switch(self, enable):

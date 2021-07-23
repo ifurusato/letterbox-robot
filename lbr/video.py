@@ -31,17 +31,15 @@ try:
 except ImportError:
     sys.exit("This script requires the ffmpeg module\nInstall with: pip3 install --user ffmpeg")
 
-from lbr.i2c_scanner import I2CScanner
-from lbr.enums import Orientation
+from lbr.orientation import Orientation
 from core.logger import Level, Logger
-from lib.lux import Lux
 
 # ..............................................................................
 class Video():
     '''
-    Provides a video-to-file and optional video-to-stream (web) functionality,
-    with options for dynamically altering the camera settings to account for
-    light levels based on a Pimoroni LTR-559 lux sensor (at 0x23).
+    Provides a video-to-file and optional video-to-stream (web) functionality.
+    The Lux mode used on the other robots is not present here; the default is
+    night mode since the inside of the letterbox is generally dark.
 
     The camera image is annotated with a title and timestamp. The output filename
     is timestamped and written to a './videos' directory in H.264 video format.
@@ -57,7 +55,6 @@ class Video():
         self._enable_streaming   = _config.get('enable_streaming')
         self._enable_file_output = _config.get('enable_file_output')
         self._port               = _config.get('port')
-        self._lux_threshold      = _config.get('lux_threshold')
         self._counter = itertools.count()
         self._server = None
 
@@ -87,15 +84,6 @@ class Video():
         self._thread   = None
         self._killer   = None
 
-        # scan I2c bus for devices
-        _i2c_scanner = I2CScanner(Level.DEBUG)
-        if _i2c_scanner.has_address([0x23]):
-            self._lux = Lux(Level.INFO)
-            self._log.info('LTR-559 lux sensor found: camera adjustment active.')
-        else:
-            self._lux = None
-            self._log.warning('no LTR-559 lux sensor found: camera adjustment inactive.')
-
         if self._enable_streaming:
             self._log.info('ready: streaming on port {:d}'.format(self._port))
         else:
@@ -116,12 +104,7 @@ class Video():
 
     # ..........................................................................
     def is_night_mode(self):
-        if self._lux is None:
-            return self._default_night_mode
-        _value = self._lux.get_value()
-        _threshold =  self._lux_threshold
-        self._log.debug('lux: {:>5.2f} <  threshold: {:>5.2f}?'.format(_value, _threshold))
-        return _value < _threshold
+        return self._default_night_mode
 
     # ..........................................................................
     def _get_timestamp(self):
@@ -410,7 +393,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         return """<!DOCTYPE html>
 <html>
 <head>
-<title>KR01 eyeball</title>
+<title>LetterBox Robot</title>
 <style>
   body {{ margin: 1em }}
 </style>

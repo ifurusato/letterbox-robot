@@ -12,15 +12,19 @@
 # Just manually turns the HT0740 switch on.
 #
 
-import sys
-from lib.pir_switch import PirSwitch
-from lib.logger import Level
+import sys, time
+
+from core.logger import Level
+from lbr.pir_switch import PirSwitch
 
 try:
+
     _pin = 24
     _i2c_address = 0x38
     _switch = PirSwitch(_pin, _i2c_address)
     _switch.turn_on_switch()
+    time.sleep(10)
+    
 except Exception as e:
     print('error turning switch on: {}'.format(e))
     sys.exit(1)
