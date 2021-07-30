@@ -69,6 +69,8 @@ Installation
 The project requires installation of a number of support libraries. In order to
 begin you'll need Python3 (at least 3.8) and pip3.
 
+You'll need the colorama, pyyaml, python-daemon, RPi.GPIO, and ht0740 libraries.
+
 The setup.py script performs a standard library installation. You can also use::
 
     sudo pip3 install -e .

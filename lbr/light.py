@@ -30,17 +30,40 @@ class Light():
         self._gpio.setwarnings(False)
         self._gpio.setmode(GPIO.BCM)
         self._gpio.setup(self._led_pin, GPIO.OUT, initial=GPIO.LOW)
+        self._pwm = None
         self._log.info('ready.')
 
     # ..........................................................................
     def enable(self):
+        '''
+        Turns on the light at full brightness.
+        '''
         self._log.info('enable.')
         self._gpio.output(self._led_pin, True)
 
     # ..........................................................................
+    def pwm(self, duty_cycle):
+        '''
+        Turns on the light at partial brightness using PWM.
+        '''
+        if self._pwm:
+            self._log.warn('PWM already enabled.')
+        else:
+            self._pwm = GPIO.PWM(self._led_pin, 100) # initialize PWM at 100Hz frequency
+            self._pwm.start(0) # Start PWM with 0% duty cycle
+            self._pwm.ChangeDutyCycle(duty_cycle)
+            self._log.info('PWM enabled at {:d} duty cycle.'.format(duty_cycle))
+
+    # ..........................................................................
     def disable(self):
-        self._log.info('disable.')
-        self._gpio.output(self._led_pin, False)
+        '''
+        Turns off the light.
+        '''
+        if self._pwm is not None:
+            self._pwm.stop()
+        else:
+            self._gpio.output(self._led_pin, False)
+        self._log.info('disabled.')
 
     # ..........................................................................
     def close(self):

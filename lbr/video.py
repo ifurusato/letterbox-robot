@@ -26,10 +26,10 @@ try:
     import tzlocal
 except ImportError:
     sys.exit("This script requires the tzlocal module\nInstall with: pip3 install --user tzlocal")
-try:
-    import ffmpeg
-except ImportError:
-    sys.exit("This script requires the ffmpeg module\nInstall with: pip3 install --user ffmpeg")
+#try:
+#    import ffmpeg
+#except ImportError:
+#    sys.exit("This script requires the ffmpeg module\nInstall with: pip3 install --user ffmpeg")
 
 from lbr.orientation import Orientation
 from core.logger import Level, Logger
@@ -293,6 +293,7 @@ class Video():
 
     # ..........................................................................
     def _convert_to_mp4(self):
+        raise Exception('unsupported')
         if os.path.exists(self._filename):
             self._log.info('converting file {} to mp4...'.format(self._filename))
             _mp4_filename = Path(self._filename).stem + ".mp4"

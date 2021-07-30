@@ -82,7 +82,7 @@ ros:
         ctrl_lights: True                        # if True, permit video to control Matrix11x7 lights
         convert_mp4: False                       # if True, convert h264 source to mp4
         annotate: True                           # if True, include annotation on video
-        title: '51 Rawhiti Road - LetterBox Robot' # the title portion of the video annotation
+        title: 'LetterBox Robot'                 # the title portion of the video annotation
         quality: -1                              # video quality: -1 for default; values between 1 (high) - 40 (low), typical between 20-25.
         remove_h264: False                       # if True, remove h264 video source after converting to mp4
         port: 8001                               # server port for streaming video

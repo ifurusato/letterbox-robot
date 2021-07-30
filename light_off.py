@@ -30,18 +30,19 @@ def main(argv):
         _config = _loader.configure('config.yaml')
 
         _light = Light(_config, Level.INFO)
-        _light.enable()
+        _light.disable()
 
-        while True:
-            time.sleep(1.0)
+#       while True:
+#           time.sleep(1.0)
 
     except KeyboardInterrupt:
         print(Fore.CYAN + Style.BRIGHT + 'caught Ctrl-C; exiting...')
     except Exception:
         print(Fore.RED + Style.BRIGHT + 'error starting ros: {}'.format(traceback.format_exc()) + Style.RESET_ALL)
     finally:
-        if _light is not None:
-            _light.close()
+#       if _light is not None:
+#           _light.close()
+        pass
 
 # call main ....................................................................
 if __name__== "__main__":
